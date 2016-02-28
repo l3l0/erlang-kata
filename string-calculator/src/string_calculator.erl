@@ -2,7 +2,7 @@
 -export([add/1]).
 
 add("") -> 0;
-add(String) when length(String) == 1 -> element(1, string:to_integer(String));
+add(String) when length(String) == 1 -> convert_to_int(String);
 
 add(String) ->
     case string:str(String, "//") == 1 of
@@ -14,9 +14,20 @@ add(String) ->
             NumberString = String
     end,
     NormalizedString = re:replace(NumberString, "\n", Delimeter, [global, {return, list}]),
-    sum(string:tokens(NormalizedString, Delimeter)).
+    Numbers = string:tokens(NormalizedString, Delimeter),
+    sum(Numbers).
 
-sum(Numbers) -> sum(Numbers, 0).
+sum(Numbers) ->
+    NegativeNumbers = lists:filter(fun (Number) -> convert_to_int(Number) < 0 end, Numbers),
+    case length(NegativeNumbers) > 0 of
+	true ->
+            throw({negatives_not_allowed, NegativeNumbers});
+	false ->
+            sum(Numbers, 0)
+    end.
 
-sum([A|B], Number) -> sum(B, element(1, string:to_integer(A)) + Number);
+sum([A|B], Number) -> sum(B, convert_to_int(A)  + Number);
 sum([], Number) -> Number.
+
+convert_to_int(Number) ->
+    element(1, string:to_integer(Number)).

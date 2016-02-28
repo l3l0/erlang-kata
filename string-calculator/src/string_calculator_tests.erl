@@ -31,3 +31,12 @@ it_allows_to_support_different_delimeters_test_() ->
         ?_assertEqual(3, string_calculator:add("//;\n1;2")),
         ?_assertEqual(3, string_calculator:add("//a\n1a2"))
     ].
+
+it_not_allows_to_negatives_in_output_test_() ->
+    [
+        ?_assertException(
+            throw,
+            {negatives_not_allowed, ["-1", "-4"]},
+            string_calculator:add("-1,2,-4")
+        )
+    ].
